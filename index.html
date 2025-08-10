@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>تسجيل الدخول - لعبة البوكر</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(135deg, #1f4037, #99f2c8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .container {
+    background: rgba(255 255 255 / 0.95);
+    padding: 25px 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    width: 350px;
+    max-width: 90vw;
+    text-align: center;
+  }
+  .logo {
+    margin-bottom: 25px;
+    opacity: 0;
+    transform: scale(0.8);
+    animation: fadeScaleIn 1s forwards;
+  }
+  @keyframes fadeScaleIn {
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  .logo img {
+    width: 120px;
+    user-select: none;
+  }
+  h2 {
+    margin-bottom: 20px;
+    color: #1f4037;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: right;
+  }
+  label {
+    font-weight: 600;
+    color: #1f4037;
+  }
+  input, select {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #1f4037;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  input:focus, select:focus {
+    border-color: #4caf50;
+  }
+  button {
+    background: #1f4037;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  button:hover {
+    background-color: #4caf50;
+  }
+  .error {
+    color: #d32f2f;
+    font-size: 13px;
+    height: 18px;
+    text-align: left;
+  }
+  /* Responsive */
+  @media (max-width: 400px) {
+    .container {
+      width: 95vw;
+      padding: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container" role="main" aria-label="نموذج تسجيل الدخول">
+  <div class="logo" aria-label="شعار اللعبة">
+    <img src="شعار-اللعبة.png" alt="شعار لعبة البوكر" />
+  </div>
+  <h2>تسجيل حساب جديد</h2>
+  <form id="registerForm" novalidate>
+    <div>
+      <label for="firstName">الاسم الأول</label>
+      <input type="text" id="firstName" name="firstName" placeholder="ادخل اسمك الأول" required autocomplete="given-name" />
+      <div class="error" id="errFirstName"></div>
+    </div>
+    <div>
+      <label for="lastName">اللقب</label>
+      <input type="text" id="lastName" name="lastName" placeholder="ادخل لقب العائلة" required autocomplete="family-name" />
+      <div class="error" id="errLastName"></div>
+    </div>
+    <div>
+      <label for="countryCode">الدولة ورقم الجوال</label>
+      <select id="countryCode" name="countryCode" required aria-label="اختر الدولة">
+        <option value="">اختر الدولة</option>
+        <option value="+967" selected>اليمن +967</option>
+        <option value="+966">السعودية +966</option>
+        <option value="+971">الإمارات +971</option>
+        <option value="+20">مصر +20</option>
+        <option value="+1">الولايات المتحدة +1</option>
+        <!-- يمكنك إضافة المزيد -->
+      </select>
+      <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="ادخل رقم الجوال" required pattern="[0-9]{5,15}" aria-describedby="phoneHelp" />
+      <small id="phoneHelp" style="color:#555; font-size:11px; display:block; margin-top:2px;">يجب إدخال رقم جوال صحيح بدون صفر البداية</small>
+      <div class="error" id="errPhone"></div>
+    </div>
+    <div>
+      <label for="email">البريد الإلكتروني</label>
+      <input type="email" id="email" name="email" placeholder="example@mail.com" required autocomplete="email" />
+      <div class="error" id="errEmail"></div>
+    </div>
+    <div>
+      <label for="language">اختر اللغة</label>
+      <select id="language" name="language" required aria-label="اختر اللغة">
+        <option value="">اختر اللغة</option>
+        <option value="ar" selected>العربية</option>
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+        <option value="fr">Français</option>
+        <option value="it">Italiano</option>
+      </select>
+      <div class="error" id="errLanguage"></div>
+    </div>
+    <button type="submit" aria-label="تسجيل">تسجيل</button>
+  </form>
+</div>
+
+<audio id="clickSound" src="click-sound.mp3" preload="auto"></audio>
+
+<script>
+  const form = document.getElementById('registerForm');
+  const clickSound = document.getElementById('clickSound');
+
+  function validateEmail(email) {
+    // تحقق بسيط من صيغة البريد الإلكتروني
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    // مسح الأخطاء القديمة
+    document.querySelectorAll('.error').forEach(el => el.textContent = '');
+
+    let valid = true;
+
+    // التحقق من الاسم الأول
+    const firstName = form.firstName.value.trim();
+    if (firstName.length < 2) {
+      document.getElementById('errFirstName').textContent = 'الاسم الأول يجب أن يحتوي على حرفين على الأقل.';
+      valid = false;
+    }
+
+    // التحقق من اللقب
+    const lastName = form.lastName.value.trim();
+    if (lastName.length < 2) {
+      document.getElementById('errLastName').textContent = 'اللقب يجب أن يحتوي على حرفين على الأقل.';
+      valid = false;
+    }
+
+    // التحقق من الدولة ورقم الجوال
+    const countryCode = form.countryCode.value;
+    const phoneNumber = form.phoneNumber.value.trim();
+    if (!countryCode) {
+      alert('يرجى اختيار الدولة.');
+      valid = false;
+    }
+    if (!phoneNumber.match(/^\d{5,15}$/)) {
+      document.getElementById('errPhone').textContent = 'رقم الجوال غير صالح.';
+      valid = false;
+    }
+
+    // التحقق من البريد الإلكتروني
+    const email = form.email.value.trim();
+    if (!validateEmail(email)) {
+      document.getElementById('errEmail').textContent = 'صيغة البريد الإلكتروني غير صحيحة.';
+      valid = false;
+    }
+
+    // التحقق من اختيار اللغة
+    const language = form.language.value;
+    if (!language) {
+      document.getElementById('errLanguage').textContent = 'يرجى اختيار اللغة.';
+      valid = false;
+    }
+
+    if (valid) {
+      // تشغيل صوت عند النجاح
+      clickSound.play().catch(() => {});
+      alert('تم التسجيل بنجاح! سيتم التحقق من بريدك الإلكتروني.');
+      // هنا يمكن إرسال البيانات إلى السيرفر عبر AJAX أو أي تقنية تريد
+      form.reset();
+    }
+  });
+</script>
+
+</body>
+</html>
